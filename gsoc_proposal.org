@@ -126,16 +126,16 @@ our private Rust and python projects.
 
 * Personal Information
 
-*Full Name*: Siddhant Kumar
-*Email*: siddhantk232@gmail.com
-*University*: Sant Longowal Institute of Engineering and Technology (http://sliet.ac.in/)
-*Location*: Punjab, India
-*Timezone*: IST (GMT+5:30)
-*Website and Blog*: https://siddhantcodes.netlify.app/
-*GitHub*: https://github.com/siddhantk232/
-*Twitter*: https://twitter.com/siddhantCodes/
-*Linkedin*: https://www.linkedin.com/in/siddhantcodes/
-*Matrix user link*: https://matrix.to/#/@siddhant_codes:matrix.org/
+- *Full Name*: Siddhant Kumar
+- *Email*: siddhantk232@gmail.com
+- *University*: Sant Longowal Institute of Engineering and Technology (http://sliet.ac.in/)
+- *Location*: Punjab, India
+- *Timezone*: IST (GMT+5:30)
+- *Website and Blog*: https://siddhantcodes.netlify.app/
+- *GitHub*: https://github.com/siddhantk232/
+- *Twitter*: https://twitter.com/siddhantCodes/
+- *Linkedin*: https://www.linkedin.com/in/siddhantcodes/
+- *Matrix user link*: https://matrix.to/#/@siddhant_codes:matrix.org/
 
 * TODO Conclusion
 
