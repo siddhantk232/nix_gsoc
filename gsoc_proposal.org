@@ -110,7 +110,8 @@ I've made one PR[5] in nixpkgs, which was simply a version change for an
 already packaged binary (Heroic Game Launcher). Other than this, I
 don't have any past contributor experience with nix/nixpkgs. I've
 mostly used git and GitHub for contributing to college projects,
-private projects, and some work projects that happen to be open source
+private projects, and some work projects that happen to be public on
+GitHub.
 
 ** As a user of nix/NixOS
 
