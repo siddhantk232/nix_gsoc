@@ -1,11 +1,8 @@
-#+options: toc:nil
+#+options: toc:nil num:1
 #+author: Siddhant Kumar
 #+email: siddhantk232@gmail.com
 #+TITLE: GSOC'24: Nix Internals: Use std::filesystem::path for Path
 #+DATE: March 18, 2024
-
-# * TODO take things from the gsoc/ideas.md of nixos/GSOC
-# * TODO take things from the google guide https://google.github.io/gsocguides/student/writing-a-proposal
 
 * Motivation
 
@@ -17,8 +14,7 @@ the GSOC program is an excellent way to get mentorship from an
 experienced programmer and learn about how projects at this scale
 carry development.
 
-\hfill
-
+\flushleft
 My exposure to C++ has primarily been academic, limited to
 problem-solving on platforms like Leetcode and
 Codeforces. Contributing to this idea would not only enhance my
@@ -33,80 +29,97 @@ and =std::string_view=. Incorporating the use of =std::filesystem= would
 encourage the use of the standard. It'll also reduce the source code
 size reducing the maintenance effort.
 
-\hfill
-
+\flushleft
 It will also aid in porting Nix to Windows, since an explicit design
 goal of std::filesystem is to be portable between Unix and Windows.
 
-Relevant issues on NixOS/nix:
+**** Relevant issues on NixOS/nix:
 
 - https://github.com/NixOS/nix/issues/9205
   
 * =Path= usage in nix
 
-- =Path=, defined in =libutil/types.hh= is referenced in 403 places[1] in
+- =Path=, defined in =libutil/types.hh= is referenced in 382 places[[[ref][1]]] in
   the codebase (including tests). The usage is spread across the
-  codebase with operations like "joining paths"[2] that are Unix specific.
+  codebase with operations like "joining paths" that are currently
+  Unix only.
 
 - =PathView=, =Paths= and, =PathSet= also defined in the same header file is
-  referenced 56 times[3] mostly in function parameters.
+  referenced 56 times mostly in function parameters.
 
 * Suggested approach
 
-An approach to carry the porting process is described below. One
-downside of this approach is that we don't get immediate feedback and
-we have to carry the whole process in one go until we get rid of all
-the errors.
+An approach to carry the porting process is described below.
 
-** Change =Path= typedefs to use =std::filesystem::path=
+** Analyse the usage of =Path= in the codebase
 
-Doing this will produce of ton of compilation erros that I will be
-able to use to drive further changes.
+It is crucial to discuss which parts of the code need changing and
+what can remain unchanged. The codebase utilizes =CanonPath=, which is
+Nix's representation of a file path that is independent of the
+filesystem. Code that does not interact with the real filesystem
+should employ =CanonPath=.
+
+\flushleft
+We begin by examining the usage of the =Path= type alias. This can be
+accomplished by replacing =Path= typedefs with
+=std::filesystem::path=.
+
+\flushleft
+Executing this change will result in numerous compilation errors,
+which we can utilize to guide further modifications.
+
+\flushleft
+Alternatively, we could use editor tooling to locate references and
+analyze them grouped by libraries (e.g., `libutil`, `libexpr`, and
+`libstore`).
 
 ** Port utils declared in =libutil/file-system.hh=
 
-This (and the corresponding .cc) file include a lot of utility
+This file (and the corresponding .cc) include a lot of utility
 functions for filesystem operations that are spread across the
 codebase. The work will start by updating these utilities to use
 =std::filesystem= where possible.
 
 ** Update remaining uses of =Path= in the codebase
 
-With the utilities updated, we will stil have a lot of code that
-refrences the =Path= typedef. However, many are trivial operations like
-reading the path and joining two paths or calling utils declared in
-=libutil/file-system.hh= which we've already ported. All these
-references will be checked based on order they appear in the compiler
-error messages.
+Once the utilities are updated, we'll still have plenty of code that
+refers to the =Path= typedef. However, most of these references
+involve simple tasks like reading a path, combining two paths, or
+using utilities declared in =libutil/file-system.hh=, which we've
+already updated. Any remaining uses of =Path= will be manually
+reviewed and updated if needed.
 
-** Manually check untouched areas where =Path= is used
+* Timeline
 
-We might end up with some code that uses =Path= and related typedefs[4]
-but haven't been touched in the porting process. Some of them should
-be fine as they're just reading the path but, to make sure, a manual
-check of all the referencing sites will be performed once we clear all
-the compiler errors.
+The GSoC 2024 program has some flexibility in the schedule for
+projects. The length of time allowed to complete a project can range
+from 10 weeks to 22 weeks for medium and large projects with the
+standard length of 12 weeks.
 
-* TODO Timeline
+\flushleft
+This is just a rough estimate which is very likely to change after discussions with the mentor and the coding time may vary depending on the coding complexity.
 
-Mention the standard coding period timeline. Then list week-wise work deliverables below
-
-- Initial discussion with the mentor
-- Learning Period (can be merged into above?)
-
-- *May 1 - 26* - Community Bonding Period | GSoC contributors get to know mentors, read documentation, get up to speed to begin working on their projects
-- *May 27* - Coding officially begins!
-- *July 8* Mentors and GSoC contributors can begin submitting midterm evaluations
-- *July 12* Midterm evaluation deadline (standard coding period)
-- *July 12 - August 19* Work Period | GSoC contributors work on their project with guidance from Mentors
-- *August 19 - 26* Final week: GSoC contributors submit their final work product and their final mentor evaluation (standard coding period)
-- *August 26 - September 2*: Mentors submit final GSoC contributor evaluations (standard coding period)
+- *May 1 - May 10*
+    Discussion with the mentor with the goal of finalizing the changes.
+- *May 11 - May 20*
+  1. Setup a base PR that will be used for writing reports, discussion on goals and merging in smaller TODO PRs.
+  2. Learn more about the codebase and C++17
+  3. start coding.
+- *May 21 - July 8*
+    Coding - port fs functions in `libutil` to use =std::filesystem::path=
+- *July 9 - July 12*
+    Midterm evaluation submission includes ported `libutil` and relevant tests
+- *July 13 - August 19*
+    Coding - port the remaing uses of =Path=, =PathView=, =Paths= and, =PathSet= to =std::filesystem::path= or =CanonPath= where necessary
+- *August 20 - August 26*
+  1. Get the base PR ready for merge to master, resolve reviews, add missing tests if any.
+  2. Final report submission
 
 * Past experience with nix
 
 ** As a contributor
 
-I've made one PR[5] in nixpkgs, which was simply a version change for an
+I've made one PR[[[contrib_nix][2]]] in nixpkgs, which was simply a version change for an
 already packaged binary (Heroic Game Launcher). Other than this, I
 don't have any past contributor experience with nix/nixpkgs. I've
 mostly used git and GitHub for contributing to college projects,
@@ -116,13 +129,12 @@ GitHub.
 ** As a user of nix/NixOS
 
 I've been using NixOS for more than 2 years now. I have also used nix
-with direnv in some of my personal projects[6].
+with direnv in some of my personal projects.
 
-\hfill
-
-Recently, I introduced Nix at my workplace, where we now utilize it
+\flushleft
+Recently, I introduced Nix at my workplace[[[work_nix][3]]], where we now utilize it
 for cross-compiling a Rust binary for Windows from
-Linux[7]. Additionally, we've begun incorporating Nix into a couple of
+Linux. Additionally, we've begun incorporating Nix into a couple of
 our private Rust and python projects.
 
 * Personal Information
@@ -138,13 +150,8 @@ our private Rust and python projects.
 - *Linkedin*: https://www.linkedin.com/in/siddhantcodes/
 - *Matrix user link*: https://matrix.to/#/@siddhant_codes:matrix.org/
 
-* TODO Conclusion
+* References
 
-Don't know if I should conclude. It'd be a nice thing to do for sure.
-
-* TODO References
-
-- [1] [2] [3] [4] TODO: mention how I got these numbers
-- [5] https://github.com/NixOS/nixpkgs/pulls?q=author%3Asiddhantk232
-- [6] list many projects where I've used nix/flakes
-- [7] https://github.com/fastn-stack/fastn/pull/1745
+- <<ref>>Uses of =Path= and other typedefs are gathered using LSP tooling.
+- <<contrib_nix>>https://github.com/NixOS/nixpkgs/pulls?q=author%3Asiddhantk232
+- <<work_nix>>https://github.com/fastn-stack/fastn/pull/1745
