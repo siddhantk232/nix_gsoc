@@ -8,8 +8,8 @@
 
 This document marks the completion of my participation in Google
 Summer of Code 2024 with the NixOS Foundation. I worked on replacing
-the usage of the internal `Path` type (an alias for `std::string`)
-with C++17's `std::filesystem::path` type, which is portable across
+the usage of the internal =Path= type (an alias for =std::string=)
+with C++17's =std::filesystem::path= type, which is portable across
 Unix and Windows. My mentor was [[https://github.com/Ericson2314][Ericson2314]].
 
 * Introduction
@@ -20,7 +20,7 @@ reproducible. It has many use cases and powers a very stable and
 reliable Linux distribution called NixOS.
 
 My project is part of an ongoing port of Nix to Windows. The scope of
-my project was to use `std::filesystem::path` and related types and
+my project was to use =std::filesystem::path= and related types and
 functions throughout the codebase to make it portable across Unix and
 Windows.
 
@@ -33,7 +33,7 @@ Windows.
 
 * Outcomes of the Project
 
-The migration to `std::filesystem::path` is complete in many parts of
+The migration to =std::filesystem::path= is complete in many parts of
 the codebase. One [[https://github.com/NixOS/nix/pull/10937][open PR]] requires attention, and some compiler errors
 need to be resolved in [[https://github.com/siddhantk232/nix/tree/more-std-filepath][siddhantk232/more-std-filepath]] before it can be
 merged.
